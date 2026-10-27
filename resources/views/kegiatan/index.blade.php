@@ -11,6 +11,53 @@
         <p>{{ $error }}</p>
     @endif
 
+    @if (session('sukses'))
+        <p>{{ session('sukses') }}</p>
+    @endif
+
+    @if ($errors->any())
+        <ul>
+            @foreach ($errors->all() as $pesan)
+                <li>{{ $pesan }}</li>
+            @endforeach
+        </ul>
+    @endif
+
+    <h2>Tambah Kegiatan</h2>
+    <form method="POST" action="{{ route('kegiatan.store') }}">
+        @csrf
+        <p>
+            <label>Kode Kegiatan</label><br>
+            <input type="text" name="kode_kegiatan" value="{{ old('kode_kegiatan') }}">
+        </p>
+        <p>
+            <label>Nama Kegiatan</label><br>
+            <input type="text" name="nama_kegiatan" value="{{ old('nama_kegiatan') }}">
+        </p>
+        <p>
+            <label>Email PIC</label><br>
+            <input type="text" name="email_pic" value="{{ old('email_pic') }}">
+        </p>
+        <p>
+            <label>Kuota</label><br>
+            <input type="text" name="kuota" value="{{ old('kuota') }}">
+        </p>
+        <p>
+            <label>Jenis Kegiatan</label><br>
+            <select name="jenis_kegiatan_id">
+                <option value="">-- Pilih jenis --</option>
+                @foreach ($jenis as $j)
+                    <option value="{{ $j['id'] }}" {{ (string) old('jenis_kegiatan_id') === (string) $j['id'] ? 'selected' : '' }}>
+                        {{ $j['nama_jenis'] }}
+                    </option>
+                @endforeach
+            </select>
+        </p>
+        <button type="submit">Simpan</button>
+    </form>
+
+    <br><hr><br>
+
     <h2>Daftar Kegiatan</h2>
     <table border="1" cellpadding="4" cellspacing="0">
         <thead>
