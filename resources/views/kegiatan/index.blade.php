@@ -58,6 +58,22 @@
 
     <br><hr><br>
 
+    <!-- FORM CARI DAN FILTER DISISIPKAN DI SINI -->
+    <h2>Cari dan Filter</h2>
+    <form method="GET" action="{{ route('kegiatan.index') }}">
+        <input type="text" name="q" value="{{ $q }}" placeholder="Kode, nama, atau email">
+        <select name="jenis_kegiatan_id">
+            <option value="">-- Semua jenis --</option>
+            @foreach ($jenis as $j)
+                <option value="{{ $j['id'] }}" {{ (string) $filter === (string) $j['id'] ? 'selected' : '' }}>
+                    {{ $j['nama_jenis'] }}
+                </option>
+            @endforeach
+        </select>
+        <button type="submit">Cari</button>
+        <a href="{{ route('kegiatan.index') }}">Reset</a>
+    </form>
+
     <h2>Daftar Kegiatan</h2>
     <table border="1" cellpadding="4" cellspacing="0">
         <thead>
@@ -69,7 +85,7 @@
                 <th>Kuota</th>
                 <th>Status Kuota</th>
                 <th>Jenis</th>
-                <th>Aksi</th> <!-- Tambahan Header Aksi -->
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -88,7 +104,6 @@
                         @endif
                     </td>
                     <td>{{ $row['nama_jenis'] }}</td>
-                    <!-- Tambahan Kolom Aksi -->
                     <td>
                         <a href="{{ route('kegiatan.edit', $row['id']) }}">Edit</a>
                         <form method="POST" action="{{ route('kegiatan.destroy', $row['id']) }}" style="display:inline">
@@ -100,7 +115,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8">Belum ada data.</td> <!-- Diubah dari 7 menjadi 8 karena nambah kolom -->
+                    <td colspan="8">Belum ada data.</td>
                 </tr>
             @endforelse
         </tbody>

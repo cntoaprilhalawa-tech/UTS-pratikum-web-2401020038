@@ -9,23 +9,50 @@ use Throwable;
 
 class KegiatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $daftar = [];
         $jenis = [];
         $error = null;
 
+        $q = trim(strip_tags((string) $request->query('q', '')));
+        $filter = trim((string) $request->query('jenis_kegiatan_id', ''));
+        if (!ctype_digit($filter)) {
+            $filter = '';
+        }
+
         try {
             $pdo = DB::connection()->getPdo();
 
-            $stmt = $pdo->prepare(
-                'SELECT k.id, k.kode_kegiatan, k.nama_kegiatan, k.email_pic,
-                        k.kuota, j.nama_jenis
-                 FROM kegiatan k
-                 JOIN jenis_kegiatan j ON j.id = k.jenis_kegiatan_id
-                 ORDER BY k.id ASC'
-            );
-            $stmt->execute();
+            $sql = 'SELECT k.id, k.kode_kegiatan, k.nama_kegiatan, k.email_pic,
+                           k.kuota, j.nama_jenis
+                    FROM kegiatan k
+                    JOIN jenis_kegiatan j ON j.id = k.jenis_kegiatan_id';
+            $kondisi = [];
+            $param = [];
+
+            if ($q !== '') {
+                $kondisi[] = '(k.kode_kegiatan LIKE :q1
+                               OR k.nama_kegiatan LIKE :q2
+                               OR k.email_pic LIKE :q3)';
+                $like = '%' . $q . '%';
+                $param[':q1'] = $like;
+                $param[':q2'] = $like;
+                $param[':q3'] = $like;
+            }
+
+            if ($filter !== '') {
+                $kondisi[] = 'k.jenis_kegiatan_id = :jenis';
+                $param[':jenis'] = $filter;
+            }
+
+            if ($kondisi) {
+                $sql .= ' WHERE ' . implode(' AND ', $kondisi);
+            }
+            $sql .= ' ORDER BY k.id ASC';
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($param);
             $daftar = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $stmtJenis = $pdo->prepare('SELECT id, nama_jenis FROM jenis_kegiatan ORDER BY nama_jenis ASC');
@@ -40,6 +67,8 @@ class KegiatanController extends Controller
             'daftar' => $daftar,
             'jenis'  => $jenis,
             'error'  => $error,
+            'q'      => $q,
+            'filter' => $filter,
         ]);
     }
 
