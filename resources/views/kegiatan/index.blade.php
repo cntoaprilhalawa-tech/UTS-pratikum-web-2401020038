@@ -69,6 +69,7 @@
                 <th>Kuota</th>
                 <th>Status Kuota</th>
                 <th>Jenis</th>
+                <th>Aksi</th> <!-- Tambahan Header Aksi -->
             </tr>
         </thead>
         <tbody>
@@ -87,10 +88,19 @@
                         @endif
                     </td>
                     <td>{{ $row['nama_jenis'] }}</td>
+                    <!-- Tambahan Kolom Aksi -->
+                    <td>
+                        <a href="{{ route('kegiatan.edit', $row['id']) }}">Edit</a>
+                        <form method="POST" action="{{ route('kegiatan.destroy', $row['id']) }}" style="display:inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</button>
+                        </form>
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7">Belum ada data.</td>
+                    <td colspan="8">Belum ada data.</td> <!-- Diubah dari 7 menjadi 8 karena nambah kolom -->
                 </tr>
             @endforelse
         </tbody>
